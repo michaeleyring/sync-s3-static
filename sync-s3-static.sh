@@ -67,15 +67,15 @@ else
   if [ $# -gt 5 ]; then
      # if requested, remove output upon completion (zip and zip output)
      if [ $6 =~ \[Cc][Ll][Ee][Aa][Nn]\ ]; then
-       $CLEAN=$DO_CLEANUP
+       $CLEAN="$DO_CLEANUP"
      else
        # We will skip the cleanup at the end
-       $CLEAN=$SKIP_CLEANUP
+       $CLEAN="$SKIP_CLEANUP"
      fi
   else
     # destructive action, so only apply if specifically requested
     # default to no cleanup
-    $CLEAN=$SKIP_CLEANUP
+    $CLEAN="$SKIP_CLEANUP"
   fi
 fi
 
