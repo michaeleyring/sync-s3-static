@@ -18,22 +18,22 @@ echo "sync-s3-static.sh"
 #       defaults to /tmp/website
 
 # SUCCESS if we make it to the end
-SUCCESS=0
+SUCCESS="0"
 # Not enough arguments passed to the program
-ERROR_NOT_ENOUGH_ARG=1
+ERROR_NOT_ENOUGH_ARG="1"
 # Error copying zip file from s3 to /tmp directory
-ERROR_COPY_ZIP=2
+ERROR_COPY_ZIP="2"
 # Error making the directory /tmp/website
-ERROR_MKDIR_TMP_WEBSITE=3
+ERROR_MKDIR_TMP_WEBSITE="3"
 # Error removing previous files from zip file extracting point
-ERROR_REMOVE_OUTPUT=4
+ERROR_REMOVE_OUTPUT="4"
 # Error syncing to S3
-ERROR_S3_SYNC=5
+ERROR_S3_SYNC="5"
 
 # Whether or not we cleanup tmp files at end, used for parameter $6
 # This is destructive so only do if specifically requested (also helps with debugging if there are issues)
-DO_CLEANUP=1
-SKIP_CLEANUP=0
+DO_CLEANUP="1"
+SKIP_CLEANUP="0"
 
 # Check to see we received the minimum parameters
 if [ $# -lt 3 ]; then
@@ -44,24 +44,29 @@ if [ $# -lt 3 ]; then
 else
   # Store parameter 1 as the input source bucket
   INPUT_BUCKET=$1
+  echo "`date` Param 1: INPUT_BUCKET = $INPUT_BUCKET"
   # Store parameter 2 as the input source folder(s)
   # I.e. Troop161_Web/dist (no slash at beginning or end)
   INPUT_FOLDER=$2
+  echo "`date` Param 2: INPUT_FOLDER = $INPUT_FOLDER"
   # Store parameter 3 as the output bucket, where things will be synched to
   WEB_BUCKET=$3
+  echo "`date` Param 3: WEB_BUCKET = $WEB_BUCKET"
   # The following are optional, use if passed otherwise defaults
   if [ $# -gt 3 ]; then
     DIR_ZIP_FILE_OUTPUT=$4
   else
     DIR_ZIP_FILE_OUTPUT="/tmp"
   fi
+  echo "`date` Param 4: DIR_ZIP_FILE_OUTPUT = $DIR_ZIP_FILE_OUTPUT"
 
   # Assign 5th parameter (or use default). Where the zip file will be extracted to
   if [ $# -gt 4 ]; then
     DIR_ZIP_EXTRACT_OUTPUT=$5
   else
-    DIR_ZIP_FILE_OUTPUT="/tmp/website"
+    DIR_ZIP_EXTRACT_OUTPUT="/tmp/website"
   fi
+  echo "`date` Param 5: DIR_ZIP_EXTRACT_OUTPUT = $DIR_ZIP_EXTRACT_OUTPUT"
 
   # Assign 6th parameter (or use default). If we clean up after completion
   if [ $# -gt 5 ]; then
@@ -77,6 +82,7 @@ else
     # default to no cleanup
     $CLEAN="$SKIP_CLEANUP"
   fi
+  echo "`date` Param  6: CLEAN = $CLEAN"
 fi
 
 # Get the file listing. Expecting only one file due to cleanup prior to build step
