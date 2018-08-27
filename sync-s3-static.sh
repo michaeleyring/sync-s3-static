@@ -74,7 +74,7 @@ else
   # Assign 6th parameter (or use default). If we clean up after completion
   if [ $# -gt 5 ]; then
      # if requested, remove output upon completion (zip and zip output)
-     if [ $6 =~ \[Cc][Ll][Ee][Aa][Nn]\ ]; then
+     if [[ $6 =~ ^(CLEAN$|clean) ]]; then
        CLEAN="$DO_CLEANUP"
      else
        # We will skip the cleanup at the end
