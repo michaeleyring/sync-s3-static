@@ -160,6 +160,16 @@ else
   echo "`date` Sync to S3 of $DIR_ZIP_EXTRACT_OUTPUT to $WEB_BUCKET succesful"
 fi
 
+# Now remove the zip file
+aws --region us-east-1 s3 rm s3://$INPUT_BUCKET/$INPUT_FOLDER/$ZIP_NAME
+# verify it worked
+if [ ! $? -eq 0 ]; then
+  echo "`date` Error with removal of build zip file from $INPUT_BUCKET/$INPUT_FOLDER/$ZIP_NAME"
+  exit ${ERROR_REMOVE_OUTPUT}
+else
+  echo "`date` Removal of input zip file succesful $INPUT_BUCKET/$INPUT_FOLDER/$ZIP_NAME"
+fi
+
 # Cleanup the temp files if requested
 # Destructive action so only applied if specifically requested
 if [ $CLEAN -eq $DO_CLEANUP ]; then
