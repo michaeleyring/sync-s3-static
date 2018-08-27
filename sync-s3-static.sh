@@ -3,6 +3,7 @@ echo "sync-s3-static.sh"
 
 # sync-s3-static.#!/bin/sh
 # Author: Michael B. Eyring
+# 8/26/2018
 # Objective: Take a zip output from CodeBuild, and extract and sync to S3.
 
 # Assumptions:
@@ -72,15 +73,15 @@ else
   if [ $# -gt 5 ]; then
      # if requested, remove output upon completion (zip and zip output)
      if [ $6 =~ \[Cc][Ll][Ee][Aa][Nn]\ ]; then
-       $CLEAN="$DO_CLEANUP"
+       CLEAN="$DO_CLEANUP"
      else
        # We will skip the cleanup at the end
-       $CLEAN="$SKIP_CLEANUP"
+       CLEAN="$SKIP_CLEANUP"
      fi
   else
     # destructive action, so only apply if specifically requested
     # default to no cleanup
-    $CLEAN="$SKIP_CLEANUP"
+    CLEAN="$SKIP_CLEANUP"
   fi
   echo "`date` Param  6: CLEAN = $CLEAN"
 fi
@@ -102,12 +103,12 @@ echo "`date` Zip file:$ZIP_NAME, extracted from $BUCKET_ZIP name"
 aws configure set s3.signature_version s3v4
 
 # copy the zip file to tmp
-BUCKET_COPY=$(aws s3 cp s3://$INPUT_BUCKET/$INPUT_FOLDER/$BUCKET_ZIP $DIR_ZIP_FILE_OUTPUT)
+BUCKET_COPY=$(aws s3 cp s3://$INPUT_BUCKET/$INPUT_FOLDER/$ZIP_NAME $DIR_ZIP_FILE_OUTPUT)
 if [ ! $? -eq 0 ]; then
-  echo "`date` Error copying $BUCKET_ZIP to $DIR_ZIP_FILE_OUTPUT"
+  echo "`date` Error copying $ZIP_NAME to $DIR_ZIP_FILE_OUTPUT"
   exit $ERROR_COPY_ZIP
 else
-  echo "`date` Copy of $BUCKET_ZIP to $DIR_ZIP_FILE_OUTPUT succesful"
+  echo "`date` Copy of $ZIP_NAME to $DIR_ZIP_FILE_OUTPUT succesful"
 fi
 
 # verify if we have the output directory to extract to
