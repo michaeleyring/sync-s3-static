@@ -26,10 +26,12 @@ ERROR_NOT_ENOUGH_ARG=1
 ERROR_COPY_ZIP=2
 # Error making the directory /tmp/website
 ERROR_MKDIR_TMP_WEBSITE=3
+# Error unzipping retrieved zip file to extract directory
+ERROR_UNZIP=4
 # Error removing previous files from zip file extracting point
-ERROR_REMOVE_OUTPUT=4
+ERROR_REMOVE_OUTPUT=5
 # Error syncing to S3
-ERROR_S3_SYNC=5
+ERROR_S3_SYNC=6
 
 # Whether or not we cleanup tmp files at end, used for parameter $6
 # This is destructive so only do if specifically requested (also helps with debugging if there are issues)
@@ -41,7 +43,7 @@ if [ $# -lt 3 ]; then
   echo "sync-s3-static.sh [Input source bucket] [Input source folder] [Output bucket (web)] [Optional:local zip directory] [Optional:local extract directory] [Optional:Clean]"
   echo "Example:"
   echo "sh synch-s3-static.sh codepipeline-us-east-1-123456789012 qa.testbucket.com folder1/folder2 /tmp /tmp/website clean"
-  exit ERROR_NOT_ENOUGH_ARGS
+  exit ${ERROR_NOT_ENOUGH_ARGS}
 else
   # Store parameter 1 as the input source bucket
   INPUT_BUCKET=$1
@@ -106,7 +108,7 @@ aws configure set s3.signature_version s3v4
 BUCKET_COPY=$(aws s3 cp s3://$INPUT_BUCKET/$INPUT_FOLDER/$ZIP_NAME $DIR_ZIP_FILE_OUTPUT)
 if [ ! $? -eq 0 ]; then
   echo "`date` Error copying $ZIP_NAME to $DIR_ZIP_FILE_OUTPUT"
-  exit $ERROR_COPY_ZIP
+  exit ${ERROR_COPY_ZIP}
 else
   echo "`date` Copy of $ZIP_NAME to $DIR_ZIP_FILE_OUTPUT succesful"
 fi
@@ -119,7 +121,7 @@ if [ ! -d "$DIR_ZIP_EXTRACT_OUTPUT" ]; then
   # alert on failure to create directory and exit
   if [ ! $? -eq 0 ]; then
     echo "`date` Error creating $DIR_ZIP_EXTRACT_OUTPUT to hold zip output"
-    exit $ERROR_MKDIR_TMP_WEBSITE
+    exit ${ERROR_MKDIR_TMP_WEBSITE}
   else
     echo "`date` Creation of $DIR_ZIP_EXTRACT_OUTPUT successful"
   fi
@@ -133,7 +135,7 @@ else
   # Check results
   if [ ! $? -eq 0 ]; then
     echo "`date` Error removing existing files from $DIR_ZIP_EXTRACT_OUTPUT"
-    exit $ERROR_REMOVE_OUTPUT
+    exit ${ERROR_REMOVE_OUTPUT}
   fi
 fi
 
@@ -143,7 +145,7 @@ unzip -o $DIR_ZIP_FILE_OUTPUT/$ZIP_NAME -d $DIR_ZIP_EXTRACT_OUTPUT
 # check the results
 if [ ! $? -eq 0 ]; then
   echo "`date` Error unzipping $ZIP_NAME to $DIR_ZIP_EXTRACT_OUTPUT"
-  exit $ERROR_UNZIP
+  exit ${ERROR_UNZIP}
 else
   echo "`date` Unzip operation succesful for $ZIP_NAME"
 fi
@@ -153,7 +155,7 @@ aws --region us-east-1 s3 sync $DIR_ZIP_EXTRACT_OUTPUT s3://$WEB_BUCKET --acl=pu
 # check status of operation
 if [ ! $? -eq 0 ]; then
   echo "`date` Error syncing $DIR_ZIP_EXTRACT_OUTPUT to $WEB_BUCKET"
-  exit $ERROR_S3_SYNC
+  exit ${ERROR_S3_SYNC}
 else
   echo "`date` Sync to S3 of $DIR_ZIP_EXTRACT_OUTPUT to $WEB_BUCKET succesful"
 fi
@@ -167,7 +169,7 @@ if [ $CLEAN -eq $DO_CLEANUP ]; then
   # check the result of the removal of zip files
   if [ ! $? -eq 0 ]; then
     echo "`date` Error removing retrieved zip file $ZIP_NAME from $DIR_ZIP_FILE_OUTPUT directory"
-    exit $ERROR_REMOVE_OUTPUT
+    exit ${ERROR_REMOVE_OUTPUT}
   else
     echo "`date` Removed $ZIP_NAME from $DIR_ZIP_FILE_OUTPUT"
   fi
@@ -178,7 +180,7 @@ if [ $CLEAN -eq $DO_CLEANUP ]; then
   # Check result
   if [ ! $? -eq 0 ]; then
     echo "`date` Error removing extracted files from $DIR_ZIP_EXTRACT_OUTPUT"
-    exit $ERROR_REMOVE_OUTPUT
+    exit ${ERROR_REMOVE_OUTPUT}
   else
     echo "`date` Removed files from $DIR_ZIP_EXTRACT_OUTPUT"
   fi # if there was an error removing extracted zip output
@@ -188,4 +190,4 @@ fi
 
 # if we made it here, we were succesful
 echo "`date` sync-s3-static.sh ompleted"
-exit SUCCESS
+exit ${SUCCESS}
