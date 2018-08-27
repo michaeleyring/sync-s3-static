@@ -19,17 +19,17 @@ echo "sync-s3-static.sh"
 #       defaults to /tmp/website
 
 # SUCCESS if we make it to the end
-SUCCESS="0"
+SUCCESS=0
 # Not enough arguments passed to the program
-ERROR_NOT_ENOUGH_ARG="1"
+ERROR_NOT_ENOUGH_ARG=1
 # Error copying zip file from s3 to /tmp directory
-ERROR_COPY_ZIP="2"
+ERROR_COPY_ZIP=2
 # Error making the directory /tmp/website
-ERROR_MKDIR_TMP_WEBSITE="3"
+ERROR_MKDIR_TMP_WEBSITE=3
 # Error removing previous files from zip file extracting point
-ERROR_REMOVE_OUTPUT="4"
+ERROR_REMOVE_OUTPUT=4
 # Error syncing to S3
-ERROR_S3_SYNC="5"
+ERROR_S3_SYNC=5
 
 # Whether or not we cleanup tmp files at end, used for parameter $6
 # This is destructive so only do if specifically requested (also helps with debugging if there are issues)
